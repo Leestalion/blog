@@ -1,3 +1,16 @@
 body {
     margin: 0;
 }
+
+.close {
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 0%;
+    right: 2%;
+    color: white;
+    font-size: 5em;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}

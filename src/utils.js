@@ -1,3 +1,5 @@
+import { Matrix4 } from 'three';
+
 function rotateAboutPoint(obj, point, axis, theta, pointIsWorld) {
     pointIsWorld = ( pointIsWorld === undefined )? false: pointIsWorld;
 
@@ -24,4 +26,22 @@ const getRandomParticlePos = (particleCount) => {
     return arr;
 }
 
-export { rotateAboutPoint, getRandomParticlePos };
+function rotateAroundWorldAxis( object, axis, radians ) {
+    let rotationMatrix = new Matrix4();
+
+    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+    rotationMatrix.multiply( object.matrix );
+    object.matrix = rotationMatrix;
+    object.rotation.setFromRotationMatrix( object.matrix );
+}
+
+function slowRotation( targetRotation, value ) {
+    if (Math.abs(targetRotation * 0.999) > value) {
+        targetRotation = targetRotation * 0.999;
+    } else {
+        targetRotation = value;
+    }
+    return targetRotation;
+}
+
+export { rotateAboutPoint, getRandomParticlePos, rotateAroundWorldAxis, slowRotation };

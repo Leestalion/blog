@@ -6,7 +6,8 @@ import { removeCloseButtons, addCloseButton } from './userInterface';
 import PLANETS from './loadAssets';
 
 export default class UserActions {
-    constructor() {
+    constructor( domElement ) {
+        this.domElement = domElement;
 
         this.mouseXOnMouseDown = 0;
         this.mouseYOnMouseDown = 0;
@@ -34,6 +35,8 @@ export default class UserActions {
         window.addEventListener( 'touchstart', onTouchStart );
         window.addEventListener( 'touchmove', onTouchMove );
         window.addEventListener( 'touchEnd', onTouchEnd );
+        console.log(window);
+        this.domElement.style.touchAction = 'none'; // disable touch scroll
 
 
         const scope = this;
@@ -143,6 +146,7 @@ export default class UserActions {
         }
 
         function onTouchStart( event ) {
+            event.preventDefault();
             if ( event.touches.length === 2 ) {
                 scaling = true;
                 fingerStartDist = Math.hypot(
@@ -152,6 +156,7 @@ export default class UserActions {
         }
 
         function onTouchMove( event ) {
+            event.preventDefault();
             if ( scaling == true ) {
                 fingerDist = Math.hypot(
                     event.touches[0].pageX - event.touches[1].pageX,
@@ -163,6 +168,7 @@ export default class UserActions {
         }
 
         function onTouchEnd( event ) {
+            event.preventDefault();
             scaling = false;
         }
     }

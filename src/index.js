@@ -25,8 +25,6 @@ import PLANETS from './loadAssets';
 
 window.addEventListener( 'resize', onResize, false );
 
-const userActions = new USER_ACTIONS();
-
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -138,6 +136,8 @@ function getComposer() {
 
 const renderer = getRenderer();
 const composer = getComposer();
+
+const userActions = new USER_ACTIONS(renderer.domElement);
 
 addLigths();
 addStarsBackground();

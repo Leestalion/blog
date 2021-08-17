@@ -5,6 +5,7 @@ function addCloseButton() {
     let leaveDiv = document.createElement('button');
     leaveDiv.innerHTML = "x";
     leaveDiv.classList.add("close");
+    leaveDiv.style.touchAction = 'none';
     leaveDiv.addEventListener("click", function() {
         removeCloseButtons();
         for (const planet in PLANETS) {

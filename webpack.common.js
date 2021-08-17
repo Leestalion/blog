@@ -8,6 +8,9 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Production',
+            meta: {
+                'viewport': { name: 'viewport', content: 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no' },
+            },
         }),
     ],
     output: {

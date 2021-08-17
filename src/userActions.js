@@ -37,18 +37,10 @@ function onMouseWheel( event ) {
 
     if ( GLOBALS.follow ) {
         distance = GLOBALS.follow.position.distanceTo(GLOBALS.cameraPosition)
-        switch( GLOBALS.follow.name ) {
-            case 'earth':
-                dist_min = 100;
-                break;
-            case 'mars':
-                dist_min = 80;
-                break;
-            case 'venus':
-                dist_min = 100;
-            default:
-                dist_min = 300;
-                break;
+        if (GLOBALS.follow.name in PLANETS) {
+            dist_min = PLANETS[GLOBALS.follow.name].size * 3;
+        } else {
+            dist_min = 300;
         }
     }
     
@@ -111,7 +103,7 @@ function onMouseDown( event ) {
                         offset_value = 200;
 
                     } else {
-                        PLANETS[planet].solarRotation = 0;
+                        PLANETS[planet].solarRotation = PLANETS[planet].defaultSolarRotation;
                     }
                     
                 }

@@ -8,7 +8,7 @@ function addCloseButton() {
     leaveDiv.addEventListener("click", function() {
         removeCloseButtons();
         for (const planet in PLANETS) {
-            PLANETS[planet].solarRotation = 0.003;
+            PLANETS[planet].solarRotation = PLANETS[planet].defaultSolarRotation;
         }
         GLOBALS.follow = null;
         GLOBALS.cameraPosition = GLOBALS.defaultCameraPosition;

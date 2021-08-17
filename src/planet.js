@@ -8,6 +8,7 @@ export default class Planet {
         this.selfRotationX = selfRotationX;
         this.selfRotationY = selfRotationY;
         this.solarRotation = solarRotation;
+        this.defaultSolarRotation = solarRotation;
         this.name = name;
         this.size = size;
         this.mesh = new Mesh();

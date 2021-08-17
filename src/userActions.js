@@ -33,12 +33,14 @@ export default class UserActions {
         window.addEventListener( 'wheel', onMouseWheel );
         window.addEventListener( 'touchstart', onTouchStart );
         window.addEventListener( 'touchmove', onTouchMove );
+        window.addEventListener( 'touchEnd', onTouchEnd );
 
 
         const scope = this;
 
         let fingerStartDist = 0;
         let fingerDist;
+        let scaling = false;
 
         // zoom functions
         function zoom( delta ) {
@@ -158,6 +160,10 @@ export default class UserActions {
                 zoom( delta );
                 fingerStartDist = fingerDist;
             }
+        }
+
+        function onTouchEnd( event ) {
+            scaling = false;
         }
     }
 }

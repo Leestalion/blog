@@ -13,40 +13,36 @@ export default class Planet {
         this.size = size;
         this.mesh = new Mesh();
         this.collidingSphere;
+
+        this.addPlanet = function(gltf, position) {
+            let planet = gltf.scene;
+            scene.add( gltf.scene );
+            planet.position.copy(position);
+            return planet;
+        }
+
+        this.addCollidingSphere = function(name, size) {
+            let collider_material = new MeshBasicMaterial({color: "white", wireframe: false});
+            let collider_geometry = new SphereGeometry(size, size, 10);
+            let collidingSphere = new Mesh( collider_geometry, collider_material );
+            collidingSphere.visible = false;
+            collidingSphere.name = name;
+            return collidingSphere;
+        }
+
+        this.init = function() {
+            let that = this;
+    
+            loader.load( this.model, function( gltf ) {
+                that.mesh = that.addPlanet(gltf, that.position)
+            } );
+    
+            this.collidingSphere = this.addCollidingSphere( this.name, this.size );
+    
+            scene.add( this.collidingSphere );
+        }
+
+        this.init();
+
     }
-
-    addPlanet(gltf) {
-        let planet = gltf.scene;
-        scene.add( gltf.scene );
-        planet.position.copy(this.position);
-        return planet;
-    }
-
-    init() {
-        let that = this;
-
-        loader.load( this.model, function( gltf ) {
-            that.mesh = addPlanet(gltf, that.position)
-        } );
-
-        this.collidingSphere = addCollidingSphere( this.name, this.size );
-
-        scene.add( this.collidingSphere );
-    }
-}
-
-function addPlanet(gltf, position) {
-    let planet = gltf.scene;
-    scene.add( gltf.scene );
-    planet.position.copy(position);
-    return planet;
-}
-
-function addCollidingSphere(name, size) {
-    let collider_material = new MeshBasicMaterial({color: "white", wireframe: false});
-    let collider_geometry = new SphereGeometry(size, size, 10);
-    let collidingSphere = new Mesh( collider_geometry, collider_material );
-    collidingSphere.visible = false;
-    collidingSphere.name = name;
-    return collidingSphere;
 }

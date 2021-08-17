@@ -10,7 +10,7 @@ import './style.css';
 import { rotateAboutPoint, getRandomParticlePos, rotateAroundWorldAxis, slowRotation } from './utils';
 
 import GLOBALS from './globals';
-import { onMouseDown, onMouseMove, onMouseUp, onMouseWheel } from './userActions';
+import USER_ACTIONS from './userActions';
 import { camera, scene } from './settings';
 
 import PLANETS from './loadAssets';
@@ -23,12 +23,9 @@ import PLANETS from './loadAssets';
 ########################################################################################################################
 ##################################################################################################################### */
 
-
-window.addEventListener( 'mousemove', onMouseMove );
-window.addEventListener( 'mousedown', onMouseDown );
-window.addEventListener( 'mouseup', onMouseUp );
-window.addEventListener( 'wheel', onMouseWheel );
 window.addEventListener( 'resize', onResize, false );
+
+const userActions = new USER_ACTIONS();
 
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;

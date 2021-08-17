@@ -9,6 +9,9 @@ export default class UserActions {
     constructor( domElement ) {
         this.domElement = domElement;
 
+        this.touchXOnTouchDown = 0;
+        this.touchYOnTouchDown = 0;
+
         this.mouseXOnMouseDown = 0;
         this.mouseYOnMouseDown = 0;
 
@@ -16,6 +19,7 @@ export default class UserActions {
         this.windowHalfY = window.innerHeight / 2;
 
         this.mouse = new Vector2();
+        this.finger = new Vector2();
 
         // raycaster
         this.getRaycaster = function() {
@@ -34,8 +38,7 @@ export default class UserActions {
         window.addEventListener( 'wheel', onMouseWheel );
         window.addEventListener( 'touchstart', onTouchStart );
         window.addEventListener( 'touchmove', onTouchMove );
-        window.addEventListener( 'touchEnd', onTouchEnd );
-        console.log(window);
+        window.addEventListener( 'touchend', onTouchEnd );
         this.domElement.style.touchAction = 'none'; // disable touch scroll
 
 
@@ -44,6 +47,7 @@ export default class UserActions {
         let fingerStartDist = 0;
         let fingerDist;
         let scaling = false;
+        let rotate = false;
 
         // zoom functions
         function zoom( delta ) {
@@ -74,6 +78,14 @@ export default class UserActions {
             zoom( delta );
         }
 
+        function rotates( intersects, mouseX, mouseY, mouseXOnMouseDown, mouseYOnMouseDown ) {
+            // move planet
+            if ( GLOBALS.follow && intersects.length > 0 && intersects[ 0 ].object && intersects[ 0 ].object.name && ( GLOBALS.mouseDown == 1 || rotate ) && (GLOBALS.follow.name in PLANETS)) {
+                PLANETS[GLOBALS.follow.name].selfRotationX = ( mouseX - mouseXOnMouseDown ) * 0.0005;
+                PLANETS[GLOBALS.follow.name].selfRotationY = ( mouseY - mouseYOnMouseDown ) * 0.0005;
+            }
+        }
+
         function onMouseMove( event ) {
             // calculate mouse position in normalized device coordinates
             // (-1 to +1) for both components
@@ -85,39 +97,23 @@ export default class UserActions {
         
             // calculates  objects intersecting the picking ray
             const intersects = scope.raycaster.intersectObjects( scene.children );
-        
-            // move planet
+
             let mouseX = event.clientX - scope.windowHalfX;
             let mouseY = event.clientY - scope.windowHalfY;
         
-            if ( GLOBALS.follow && intersects.length > 0 && intersects[ 0 ].object && intersects[ 0 ].object.name && GLOBALS.mouseDown == 1 && (GLOBALS.follow.name in PLANETS)) {
-                PLANETS[GLOBALS.follow.name].selfRotationX = ( mouseX - scope.mouseXOnMouseDown ) * 0.0005;
-                PLANETS[GLOBALS.follow.name].selfRotationY = ( mouseY - scope.mouseYOnMouseDown ) * 0.0005;
-            }
+            rotates( intersects, mouseX, mouseY, scope.mouseXOnMouseDown, scope.mouseYOnMouseDown );
         
         }
 
-        function onMouseDown( event ) { 
-            event.preventDefault();
-        
-            ++GLOBALS.mouseDown;
-            scope.mouseXOnMouseDown = event.clientX - scope.windowHalfX;
-            scope.mouseYOnMouseDown = event.clientY - scope.windowHalfY;
-        
-            // update the picking ray with the camera and mouse position
-            scope.raycaster.setFromCamera( scope.mouse, camera );
-        
-            // calculates  objects intersecting the picking ray
-            const intersects = scope.raycaster.intersectObjects( scene.children );
-        
-            // make intersected objects emissive
+        function moveCamera( intersects ) {
             if ( intersects.length > 0) {
                 if ( intersects[ 0 ].object && intersects[ 0 ].object.name ) {
+
                     GLOBALS.follow = intersects[ 0 ].object
                     let offset_value;
                     removeCloseButtons();
                     addCloseButton();
-        
+                    
                     if (GLOBALS.follow.name in PLANETS) {
                         for (const planet in PLANETS) {
                             
@@ -141,6 +137,23 @@ export default class UserActions {
             }
         }
 
+        function onMouseDown( event ) { 
+            event.preventDefault();
+        
+            ++GLOBALS.mouseDown;
+            scope.mouseXOnMouseDown = event.clientX - scope.windowHalfX;
+            scope.mouseYOnMouseDown = event.clientY - scope.windowHalfY;
+        
+            // update the picking ray with the camera and mouse position
+            scope.raycaster.setFromCamera( scope.mouse, camera );
+        
+            // calculates objects intersecting the picking ray
+            const intersects = scope.raycaster.intersectObjects( scene.children );
+        
+            // move camera on the intersected object
+            moveCamera( intersects );
+        }
+
         function onMouseUp() {
             --GLOBALS.mouseDown;
         }
@@ -152,24 +165,60 @@ export default class UserActions {
                 fingerStartDist = Math.hypot(
                     event.touches[0].pageX - event.touches[1].pageX,
                     event.touches[0].pageY - event.touches[1].pageY);
+            } else if ( event.touches.length === 1 ) {
+
+                rotate = true;
+
+                scope.touchXOnTouchDown = event.touches[0].clientX - scope.windowHalfX;
+                scope.touchYOnTouchDown = event.touches[0].clientY - scope.windowHalfY;
+
+                scope.finger.x = ( event.touches[0].clientX / window.innerWidth) * 2 - 1;
+                scope.finger.y = - ( event.touches[0].clientY / window.innerHeight) * 2 + 1;
+
+                // update the picking ray with the camera and mouse position
+                scope.raycaster.setFromCamera( scope.finger, camera );
+            
+                // calculates objects intersecting the picking ray
+                const intersects = scope.raycaster.intersectObjects( scene.children );
+                
+                // move camera on the intersected object
+                moveCamera( intersects );
             }
+
         }
 
         function onTouchMove( event ) {
+
             event.preventDefault();
             if ( scaling == true ) {
                 fingerDist = Math.hypot(
                     event.touches[0].pageX - event.touches[1].pageX,
                     event.touches[0].pageY - event.touches[1].pageY);
+
                 const delta = (fingerDist < fingerStartDist) ? 1 : -1 ;
                 zoom( delta );
                 fingerStartDist = fingerDist;
+            } else if ( event.touches.length === 1 ){
+
+                scope.finger.x = ( event.touches[0].clientX / window.innerWidth) * 2 - 1;
+                scope.finger.y = - ( event.touches[0].clientY / window.innerHeight) * 2 + 1;
+
+                scope.raycaster.setFromCamera( scope.finger, camera );
+        
+                // calculates objects intersecting the picking ray
+                const intersects = scope.raycaster.intersectObjects( scene.children );
+
+                let fingerX = event.touches[0].clientX - scope.windowHalfX;
+                let fingerY = event.touches[0].clientY - scope.windowHalfY;
+
+                rotates( intersects, fingerX, fingerY, scope.touchXOnTouchDown, scope.touchYOnTouchDown );
             }
         }
 
         function onTouchEnd( event ) {
             event.preventDefault();
             scaling = false;
+            rotate = false;
         }
     }
 }

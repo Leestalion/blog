@@ -5,6 +5,7 @@ export default {
     defaultCameraPosition: new Vector3(0, 0, 1500),
     cameraPosition: new Vector3(0, 0, 1500),
     mouseDown: 0,
+    touchDown: 0,
 
     earth: {
         solarAngleSpeed: 0.003,

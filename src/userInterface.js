@@ -6,15 +6,18 @@ function addCloseButton() {
     leaveDiv.innerHTML = "x";
     leaveDiv.classList.add("close");
     leaveDiv.style.touchAction = 'none';
-    leaveDiv.addEventListener("click", function() {
-        removeCloseButtons();
-        for (const planet in PLANETS) {
-            PLANETS[planet].solarRotation = PLANETS[planet].defaultSolarRotation;
-        }
-        GLOBALS.follow = null;
-        GLOBALS.cameraPosition = GLOBALS.defaultCameraPosition;
-    });
+    leaveDiv.addEventListener("click", resetCameraPos);
+    leaveDiv.addEventListener("touchstart", resetCameraPos);
     document.body.appendChild(leaveDiv);
+}
+
+function resetCameraPos() {
+    removeCloseButtons();
+    for (const planet in PLANETS) {
+        PLANETS[planet].solarRotation = PLANETS[planet].defaultSolarRotation;
+    }
+    GLOBALS.follow = null;
+    GLOBALS.cameraPosition = GLOBALS.defaultCameraPosition;
 }
 
 function removeCloseButtons() {

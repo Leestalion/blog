@@ -45,8 +45,6 @@ export default class UserActions {
 
         let fingerStartDist = 0;
         let fingerDist;
-        let scaling = false;
-        let rotate = false;
 
         const STATE = {
             IDLE: 0,
@@ -86,10 +84,19 @@ export default class UserActions {
 
         function rotates( intersects, pointerX, pointerY, pointerXOnPointerDown, pointerYOnPointerDown ) {
             // move planet
-            if ( GLOBALS.follow && intersects.length > 0 && intersects[ 0 ].object && intersects[ 0 ].object.name && ( GLOBALS.mouseDown == 1 || rotate ) && (GLOBALS.follow.name in PLANETS)) {
+            if ( GLOBALS.follow && intersects.length > 0 && intersects[ 0 ].object && intersects[ 0 ].object.name && ( GLOBALS.mouseDown == 1 ) && (GLOBALS.follow.name in PLANETS)) {
                 PLANETS[GLOBALS.follow.name].selfRotationX = ( pointerX - pointerXOnPointerDown ) * 0.0005;
                 PLANETS[GLOBALS.follow.name].selfRotationY = ( pointerY - pointerYOnPointerDown ) * 0.0005;
             }
+        }
+
+        function updatePointer(x, y, id) {
+            TOUCH_POINTS.findIndex( function( point, index ) {
+                if (point.pointer_id == id ) {
+                    point.x = x;
+                    point.y = y;
+                }
+            });
         }
 
         function onPointerMove( event ) {
@@ -98,6 +105,7 @@ export default class UserActions {
 
             switch( TOUCH_POINTS.length ) {
                 case 1:
+                    updatePointer( event.pageX, event.pageY, event.pointerId)
                     scope.pointer.x = ( event.clientX / window.innerWidth) * 2 - 1;
                     scope.pointer.y = - ( event.clientY / window.innerHeight) * 2 + 1;
                 
@@ -113,9 +121,10 @@ export default class UserActions {
                     break;
 
                 case 2:
+                    updatePointer( event.pageX, event.pageY, event.pointerId)
                     fingerDist = Math.hypot(
-                        TOUCH_POINTS[0].x - TOUCH_POINTS[1].x,
-                        TOUCH_POINTS[0].y - TOUCH_POINTS[1].y);
+                        event.pageX - TOUCH_POINTS[1].x,
+                        event.pageY - TOUCH_POINTS[1].y);
     
                     const delta = (fingerDist < fingerStartDist) ? 1 : -1 ;
                     zoom( delta );
@@ -202,69 +211,6 @@ export default class UserActions {
             })
             TOUCH_POINTS.splice( index, 1 );
         }
-
-        // function onTouchStart( event ) {
-        //     event.preventDefault();
-        //     if ( event.touches.length === 2 ) {
-        //         scaling = true;
-        //         fingerStartDist = Math.hypot(
-        //             event.touches[0].pageX - event.touches[1].pageX,
-        //             event.touches[0].pageY - event.touches[1].pageY);
-        //     } else if ( event.touches.length === 1 ) {
-
-        //         rotate = true;
-
-        //         scope.touchXOnTouchDown = event.touches[0].clientX - scope.windowHalfX;
-        //         scope.touchYOnTouchDown = event.touches[0].clientY - scope.windowHalfY;
-
-        //         scope.finger.x = ( event.touches[0].clientX / window.innerWidth) * 2 - 1;
-        //         scope.finger.y = - ( event.touches[0].clientY / window.innerHeight) * 2 + 1;
-
-        //         // update the picking ray with the camera and mouse position
-        //         scope.raycaster.setFromCamera( scope.finger, camera );
-            
-        //         // calculates objects intersecting the picking ray
-        //         const intersects = scope.raycaster.intersectObjects( scene.children );
-                
-        //         // move camera on the intersected object
-        //         moveCamera( intersects );
-        //     }
-
-        // }
-
-        // function onTouchMove( event ) {
-
-        //     event.preventDefault();
-        //     if ( scaling == true ) {
-        //         fingerDist = Math.hypot(
-        //             event.touches[0].pageX - event.touches[1].pageX,
-        //             event.touches[0].pageY - event.touches[1].pageY);
-
-        //         const delta = (fingerDist < fingerStartDist) ? 1 : -1 ;
-        //         zoom( delta );
-        //         fingerStartDist = fingerDist;
-        //     } else if ( event.touches.length === 1 ){
-
-        //         scope.finger.x = ( event.touches[0].clientX / window.innerWidth) * 2 - 1;
-        //         scope.finger.y = - ( event.touches[0].clientY / window.innerHeight) * 2 + 1;
-
-        //         scope.raycaster.setFromCamera( scope.finger, camera );
-        
-        //         // calculates objects intersecting the picking ray
-        //         const intersects = scope.raycaster.intersectObjects( scene.children );
-
-        //         let fingerX = event.touches[0].clientX - scope.windowHalfX;
-        //         let fingerY = event.touches[0].clientY - scope.windowHalfY;
-
-        //         rotates( intersects, fingerX, fingerY, scope.touchXOnTouchDown, scope.touchYOnTouchDown );
-        //     }
-        // }
-
-        // function onTouchEnd( event ) {
-        //     event.preventDefault();
-        //     scaling = false;
-        //     rotate = false;
-        // }
 
         function addCloseButton() {
             let leaveDiv = document.createElement('button');

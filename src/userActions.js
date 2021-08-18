@@ -123,8 +123,8 @@ export default class UserActions {
                 case 2:
                     updatePointer( event.pageX, event.pageY, event.pointerId)
                     fingerDist = Math.hypot(
-                        event.pageX - TOUCH_POINTS[1].x,
-                        event.pageY - TOUCH_POINTS[1].y);
+                        TOUCH_POINTS[0].x - TOUCH_POINTS[1].x,
+                        TOUCH_POINTS[0].y - TOUCH_POINTS[1].y);
     
                     const delta = (fingerDist < fingerStartDist) ? 1 : -1 ;
                     zoom( delta );

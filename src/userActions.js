@@ -129,6 +129,7 @@ export default class UserActions {
                     const delta = (fingerDist < fingerStartDist) ? 1 : -1 ;
                     zoom( delta );
                     fingerStartDist = fingerDist;
+                    break;
             }
         }
 
